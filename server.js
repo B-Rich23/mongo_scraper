@@ -17,7 +17,7 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT =  3000;
+var PORT =  8080;
 
 // Initialize Express
 var app = express();
@@ -52,32 +52,31 @@ mongoose.connect("mongodb://localhost/mongo_scraper", {
 // A GET route for scraping the echojs website
 app.get("/scrape", function (req, res) {
     // First, we grab the body of the html with request
-    axios.get("https://www.echojs.com/").then(function (response) {
+    axios.get("https://www.nytimes.com/").then(function (response) {
         // Then, we load that into cheerio and save it to $ for a shorthand selector
         var $ = cheerio.load(response.data);
 
         // Now, we grab every h2 within an article tag, and do the following:
-        $("article h2").each(function (i, element) {
+        $("article").each(function (i, element) {
             // Save an empty result object
             var result = {};
 
             // Add the text and href of every link, and save them as properties of the result object
             result.title = $(this)
-                .children("a")
+                .children("h2")
                 .text();
             result.link = $(this)
-                .children("a")
+                .children("h2").children("a")
                 .attr("href");
-            // result.summary = $(this)
-            //     .children(".summary")
-            //     .text();
+            result.summary = $(this).children("p.summary")
+            .text();
 
             // Create a new Article using the `result` object built from scraping
             db.Article.create(result)
                 .then(function (dbArticle) {
-                    res.send("Scrape Complete");
                     // View the added result in the console
                     console.log(dbArticle);
+
                 })
                 .catch(function(err) {
                     // If an error occurred, send it to the client
@@ -86,7 +85,7 @@ app.get("/scrape", function (req, res) {
         });
 
         // If we were able to successfully scrape and save an Article, send a message to the client
-        // res.send("Scrape Complete");
+        res.send("Scrape Complete");
     });
 });
 
