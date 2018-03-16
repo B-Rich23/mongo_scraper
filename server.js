@@ -37,11 +37,12 @@ app.use(express.static("public"));
 // app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 // app.set("view engine", "handlebars");
 
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongo_scraper";
 
 // By default mongoose uses callbacks for async queries, we're setting it to use promises (.then syntax) instead
 // Connect to the Mongo DB
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/mongo_scraper", {
+mongoose.connect(MONGODB_URI, {
     useMongoClient: true
 });
 
