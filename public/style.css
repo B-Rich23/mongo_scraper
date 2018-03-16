@@ -78,7 +78,7 @@ body {
   position: relative;
 }
 
-.panel.panel-default .panel-heading h3 {
+.panel.panel-default .panel-heading h4 {
   color: white;
 }
 
@@ -102,7 +102,7 @@ body {
   width: 80%;
 }
 
-.footer > .container > p {
+.footer .container  p {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -115,18 +115,18 @@ body {
   background: #0c7cd5;
 }
 
-.navbar-nav > li > a.scrape-new {
+.navbar-nav  li  a.scrape-new {
   padding: 10px;
   margin-top: 10px;
   font-weight: 800;
   color: white;
 }
 
-.navbar-nav > li > a.scrape-new:hover {
+.navbar-nav li  a.scrape-new:hover {
   background: #4caf50;
 }
 
-.navbar-nav > li > a.scrape-new:active {
+.navbar-nav  li  a.scrape-new:active {
   background: #e51c23;
 }
 

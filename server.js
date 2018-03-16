@@ -3,8 +3,13 @@ var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var path = require("path");
-// var exphbs = require("express-handlebars");
+var exphbs = require("express-handlebars");
 // var methodOverride = require("method-override");
+
+
+var Note = require("./models/note.js");
+var Article = require("./models/article.js");
+
 
 
 
@@ -34,8 +39,8 @@ app.use(express.static("public"));
 // Override with POST having ?_method=DELETE
 // app.use(methodOverride('_method'));
 
-// app.engine("handlebars", exphbs({ defaultLayout: "main" }));
-// app.set("view engine", "handlebars");
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
 
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongo_scraper";
 
@@ -48,6 +53,27 @@ mongoose.connect(MONGODB_URI, {
 
 // Routes
 // var viewsRoutes = require("./routes/views-routes.js")(app);
+
+//GET requests to render Handlebars pages
+app.get("/", function (req, res) {
+    Article.find({ "saved": false }, function (error, data) {
+        var hbsObject = {
+            article: data
+        };
+        console.log(hbsObject);
+        res.render("home", hbsObject);
+    });
+});
+
+app.get("/articles/save", function (req, res) {
+    Article.find({ "saved": true }).populate("notes").exec(function (error, articles) {
+        var hbsObject = {
+            article: articles
+        };
+        res.render("saved", hbsObject);
+    });
+});
+
 
 
 // A GET route for scraping the echojs website
@@ -105,7 +131,7 @@ app.get("/articles", function (req, res) {
 });
 
 // Route for grabbing a specific Article by id, populate it with it's note
-app.get("/articles/:id", function (req, res) {
+app.get("/articles/save/:id", function (req, res) {
     // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
     db.Article.findOne({ _id: req.params.id })
         // ..and populate all of the notes associated with it
@@ -139,6 +165,24 @@ app.post("/articles/:id", function (req, res) {
             res.json(err);
         });
 });
+
+// Save an article
+app.post("/articles/save/:id", function (req, res) {
+    // Use the article id to find and update its saved boolean
+    Article.findOneAndUpdate({ "_id": req.params.id }, { "saved": true })
+        // Execute the above query
+        .exec(function (err, doc) {
+            // Log any errors
+            if (err) {
+                console.log(err);
+            }
+            else {
+                // Or send the document to the browser
+                res.send(doc);
+            }
+        });
+});
+
 
 // Start the server
 app.listen(PORT, function () {
