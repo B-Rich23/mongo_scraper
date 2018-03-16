@@ -1,78 +1,78 @@
 $(document).ready(function () {
 
 
-// Grab the articles as a json
-$.getJSON("/articles", function (data) {
-    // For each one
-    for (var i = 0; i < data.length; i++) {
-        // Display the apropos information on the page
-        $("#articles").prepend("<p data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].summary + "<br />" + data[i].link + "</p>");
-    }
-});
+// // Grab the articles as a json
+// $.getJSON("/articles", function (data) {
+//     // For each one
+//     for (var i = 0; i < data.length; i++) {
+//         // Display the apropos information on the page
+//         $("#articles").prepend("<p data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].summary + "<br />" + data[i].link + "</p>");
+//     }
+// });
 
 
-// Whenever someone clicks a p tag
-$(document).on("click", "p", function () {
-    // Empty the notes from the note section
-    $("#notes").empty();
-    // Save the id from the p tag
-    var thisId = $(this).attr("data-id");
+// // Whenever someone clicks a p tag
+// $(document).on("click", "p", function () {
+//     // Empty the notes from the note section
+//     $("#notes").empty();
+//     // Save the id from the p tag
+//     var thisId = $(this).attr("data-id");
 
-    // Now make an ajax call for the Article
-    $.ajax({
-        method: "GET",
-        url: "/articles/" + thisId
-    })
-        // With that done, add the note information to the page
-        .then(function (data) {
-            console.log(data);
-            // The title of the article
-            $("#notes").prepend("<h2>" + data.title + "</h2>");
-            // An input to enter a new title
-            $("#notes").prepend("<input id='titleinput' name='title' >");
-            // A textarea to add a new note body
-            $("#notes").prepend("<textarea id='bodyinput' name='body'></textarea>");
-            // A button to submit a new note, with the id of the article saved to it
-            $("#notes").prepend("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
+//     // Now make an ajax call for the Article
+//     $.ajax({
+//         method: "GET",
+//         url: "/articles/" + thisId
+//     })
+//         // With that done, add the note information to the page
+//         .then(function (data) {
+//             console.log(data);
+//             // The title of the article
+//             $("#notes").prepend("<h2>" + data.title + "</h2>");
+//             // An input to enter a new title
+//             $("#notes").prepend("<input id='titleinput' name='title' >");
+//             // A textarea to add a new note body
+//             $("#notes").prepend("<textarea id='bodyinput' name='body'></textarea>");
+//             // A button to submit a new note, with the id of the article saved to it
+//             $("#notes").prepend("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
 
-            // If there's a note in the article
-            if (data.note) {
-                // Place the title of the note in the title input
-                $("#titleinput").val(data.note.title);
-                // Place the body of the note in the body textarea
-                $("#bodyinput").val(data.note.body);
-            }
-        });
-});
+//             // If there's a note in the article
+//             if (data.note) {
+//                 // Place the title of the note in the title input
+//                 $("#titleinput").val(data.note.title);
+//                 // Place the body of the note in the body textarea
+//                 $("#bodyinput").val(data.note.body);
+//             }
+//         });
+// });
 
-// When you click the savenote button
-$(document).on("click", "#savenote", function () {
-    // Grab the id associated with the article from the submit button
-    var thisId = $(this).attr("data-id");
+// // When you click the savenote button
+// $(document).on("click", "#savenote", function () {
+//     // Grab the id associated with the article from the submit button
+//     var thisId = $(this).attr("data-id");
 
-    // Run a POST request to change the note, using what's entered in the inputs
-    $.ajax({
-        method: "POST",
-        url: "/articles/" + thisId,
-        data: {
-            // Value taken from title input
-            title: $("#titleinput").val(),
-            // Value taken from note textarea
-            body: $("#bodyinput").val()
-        }
-    })
-        // With that done
-        .then(function (data) {
-            // Log the response
-            console.log(data);
-            // Empty the notes section
-            $("#notes").empty();
-        });
+//     // Run a POST request to change the note, using what's entered in the inputs
+//     $.ajax({
+//         method: "POST",
+//         url: "/articles/" + thisId,
+//         data: {
+//             // Value taken from title input
+//             title: $("#titleinput").val(),
+//             // Value taken from note textarea
+//             body: $("#bodyinput").val()
+//         }
+//     })
+//         // With that done
+//         .then(function (data) {
+//             // Log the response
+//             console.log(data);
+//             // Empty the notes section
+//             $("#notes").empty();
+//         });
 
-    // Also, remove the values entered in the input and textarea for note entry
-    $("#titleinput").val("");
-    $("#bodyinput").val("");
-});
+//     // Also, remove the values entered in the input and textarea for note entry
+//     $("#titleinput").val("");
+//     $("#bodyinput").val("");
+// });
 
 
 /* gloabl  */
@@ -80,17 +80,18 @@ $(document).on("click", "#savenote", function () {
     // Setting a reference to the article-container div where all the dynamic content will go
     // Adding event listeners to any dynamically generated "save article"
     // and "scrape new article" buttons
+    var message = "You scraped new articles";
     var articleContainer = $(".article-container");
     $(document).on("click", ".btn.save", handleArticleSave);
     $(document).on("click", ".scrape-new", handleArticleScrape);
 
-    // Once the page is ready, run the initPage function to kick things off
-    initPage();
+    // Once the page is ready, run the startPage function to kick things off
+    startPage();
 
-    function initPage() {
+    function startPage() {
         // Empty the article container, run an AJAX request for any unsaved headlines
         articleContainer.empty();
-        $.get("/api/headlines?saved=false").then(function (data) {
+        $.get("/articles?saved=false").then(function (data) {
             // If we have headlines, render them to the page
             if (data && data.length) {
                 renderArticles(data);
@@ -134,7 +135,9 @@ $(document).on("click", "#savenote", function () {
                 "</h3>",
                 "</div>",
                 "<div class='panel-body'>",
+                "<h4>",
                 article.summary,
+                "</h4>",
                 "</div>",
                 "</div>"
             ].join("")
@@ -184,20 +187,20 @@ $(document).on("click", "#savenote", function () {
             // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
             // (which casts to 'true')
             if (data.ok) {
-                // Run the initPage function again. This will reload the entire list of articles
-                initPage();
+                // Run the startPage function again. This will reload the entire list of articles
+                startPage();
             }
         });
     }
 
     function handleArticleScrape() {
         // This function handles the user clicking any "scrape new article" buttons
-        $.get("/api/fetch").then(function (data) {
+        $.get("/scrape").then(function (data) {
             // If we are able to succesfully scrape the NYTIMES and compare the articles to those
             // already in our collection, re render the articles on the page
             // and let the user know how many unique articles we were able to save
-            initPage();
-            bootbox.alert("<h3 class='text-center m-top-80'>" + data.message + "<h3>");
+            startPage();
+            bootbox.alert("<h3 class='text-center m-top-80'>" + message + "<h3>");
         });
     }
 });
