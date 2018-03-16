@@ -147,7 +147,7 @@ app.get("/articles/save/:id", function (req, res) {
 });
 
 // Route for saving/updating an Article's associated Note
-app.post("/articles/:id", function (req, res) {
+app.post("/notes/save/:id", function (req, res) {
     // Create a new note and pass the req.body to the entry
     db.Note.create(req.body)
         .then(function (dbNote) {
@@ -166,7 +166,7 @@ app.post("/articles/:id", function (req, res) {
         });
 });
 
-// Save an article
+// Route to save an article
 app.post("/articles/save/:id", function (req, res) {
     // Use the article id to find and update its saved boolean
     Article.findOneAndUpdate({ "_id": req.params.id }, { "saved": true })
@@ -181,6 +181,7 @@ app.post("/articles/save/:id", function (req, res) {
                 res.send(doc);
             }
         });
+
 });
 
 
