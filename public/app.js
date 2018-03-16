@@ -100,7 +100,7 @@ $(document).ready(function () {
                 // Otherwise render a message explaing we have no articles
                 renderEmpty();
             }
-        });
+        }); db.Articles.deleteMany({})
     }
 
     function renderArticles(articles) {
@@ -163,7 +163,7 @@ $(document).ready(function () {
                 "</div>",
                 "<div class='panel-body text-center'>",
                 "<h4><a class='scrape-new'>Try Scraping New Articles</a></h4>",
-                "<h4><a href='/saved'>Go to Saved Articles</a></h4>",
+                "<h4><a href='/articles/saved'>Go to Saved Articles</a></h4>",
                 "</div>",
                 "</div>"
             ].join("")
@@ -178,20 +178,26 @@ $(document).ready(function () {
         // to the element using the .data method. Here we retrieve that.
         var articleToSave = $(this).parents(".panel").data();
         articleToSave.saved = true;
+
+            $.ajax({
+                method: "POST",
+                url: "/articles/saved/" 
+            }).done(function (data) {
+                res.redirect("/");
+            });
+
         // Using a patch method to be semantic since this is an update to an existing record in our collection
-        $.ajax({
-            method: "PUT",
-            url: "/api/headlines",
-            data: articleToSave
-        }).then(function (data) {
-            // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
-            // (which casts to 'true')
-            if (data.ok) {
+        // $.ajax({
+        //     method: "PUT",
+        //     url: "/saved",
+        //     data: articleToSave
+        // }).then(function (data) {
+        //     // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
+        //     // (which casts to 'true')
+        //     if (data.ok) {
                 // Run the startPage function again. This will reload the entire list of articles
                 startPage();
-            }
-        });
-    }
+            };
 
     function handleArticleScrape() {
         // This function handles the user clicking any "scrape new article" buttons
