@@ -63,6 +63,7 @@ app.get("/", function (req, res) {
         console.log(hbsObject);
         res.render("home", hbsObject);
     });
+    
 });
 
 app.get("/articles/save", function (req, res) {
